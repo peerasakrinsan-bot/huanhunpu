@@ -10,7 +10,7 @@ extends Resource
 @export var is_player: bool = false
 
 func duplicate_stats() -> CombatantStats:
-	var copy := CombatantStats.new()
+	var copy: CombatantStats = CombatantStats.new()
 	copy.display_name = display_name
 	copy.max_hp = max_hp
 	copy.max_qi = max_qi

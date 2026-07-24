@@ -33,7 +33,7 @@ func take_pure_damage(amount: int) -> void:
 	hp = maxi(0, hp - amount)
 
 func add_status(kind: StatusEffect.Kind, stacks: int) -> void:
-	for effect in statuses:
+	for effect: StatusEffect in statuses:
 		if effect.kind == kind:
 			effect.stacks += stacks
 			return
@@ -41,8 +41,8 @@ func add_status(kind: StatusEffect.Kind, stacks: int) -> void:
 
 func tick_statuses() -> Array[String]:
 	var messages: Array[String] = []
-	for effect in statuses.duplicate():
-		var message := effect.tick(self)
+	for effect: StatusEffect in statuses.duplicate():
+		var message: String = effect.tick(self)
 		if not message.is_empty():
 			messages.append(message)
 		if effect.is_expired():
@@ -53,6 +53,6 @@ func status_text() -> String:
 	if statuses.is_empty():
 		return "None"
 	var labels: Array[String] = []
-	for effect in statuses:
+	for effect: StatusEffect in statuses:
 		labels.append(effect.get_label())
 	return ", ".join(labels)

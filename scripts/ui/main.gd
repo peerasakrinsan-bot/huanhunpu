@@ -23,7 +23,7 @@ func _ready() -> void:
 	engine.start_stage_one()
 
 func _refresh() -> void:
-	var enemy := engine.get_active_enemy()
+	var enemy: Combatant = engine.get_active_enemy()
 	player_label.text = "%s\nHP %d/%d   Qi %d/%d" % [engine.player.stats.display_name, engine.player.hp, engine.player.stats.max_hp, engine.player.qi, engine.player.stats.max_qi]
 	if enemy == null:
 		enemy_label.text = "Enemy Queue Cleared"
@@ -38,8 +38,8 @@ func _refresh() -> void:
 
 func _enemy_queue_text() -> String:
 	var names: Array[String] = []
-	for index in range(engine.active_enemy_index, engine.enemies.size()):
-		var enemy := engine.enemies[index]
+	for index: int in range(engine.active_enemy_index, engine.enemies.size()):
+		var enemy: Combatant = engine.enemies[index]
 		if enemy.is_alive():
 			names.append(enemy.stats.display_name)
 	return " → ".join(names)

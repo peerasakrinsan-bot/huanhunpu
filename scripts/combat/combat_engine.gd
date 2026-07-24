@@ -5,7 +5,7 @@ signal state_changed
 signal log_added(message: String)
 signal combat_finished(victory: bool)
 
-const METER_READY := 100
+const METER_READY: int = 100
 
 var player: Combatant
 var enemies: Array[Combatant] = []
@@ -29,8 +29,8 @@ func start_stage_one() -> void:
 func use_basic_attack() -> void:
 	if not waiting_for_player:
 		return
-	var enemy := get_active_enemy()
-	var dealt := enemy.take_damage(player.stats.attack)
+	var enemy: Combatant = get_active_enemy()
+	var dealt: int = enemy.take_damage(player.stats.attack)
 	enemy.add_status(StatusEffect.Kind.INTERNAL_WOUND, 1)
 	_log("Blood Slash deals %d and adds Internal Wound." % dealt)
 	_finish_actor_turn()
@@ -38,10 +38,10 @@ func use_basic_attack() -> void:
 func use_blood_art() -> void:
 	if not waiting_for_player or player.qi < 3 or player.hp <= 10:
 		return
-	var enemy := get_active_enemy()
+	var enemy: Combatant = get_active_enemy()
 	player.spend_qi(3)
 	player.take_pure_damage(8)
-	var dealt := enemy.take_damage(int(player.stats.attack * 2.0))
+	var dealt: int = enemy.take_damage(int(player.stats.attack * 2.0))
 	enemy.add_status(StatusEffect.Kind.INTERNAL_WOUND, 2)
 	_log("Blood Debt Sword costs 8 HP and 3 Qi, dealing %d." % dealt)
 	_finish_actor_turn()
@@ -60,12 +60,17 @@ func get_active_enemy() -> Combatant:
 
 func get_turn_preview(count: int = 4) -> Array[String]:
 	var preview: Array[String] = []
-	var simulated: Array[Combatant] = [player, get_active_enemy()].filter(func(c): return c != null and c.is_alive())
-	var meters := {}
-	for combatant in simulated:
+	var simulated: Array[Combatant] = []
+	if player != null and player.is_alive():
+		simulated.append(player)
+	var active_enemy: Combatant = get_active_enemy()
+	if active_enemy != null and active_enemy.is_alive():
+		simulated.append(active_enemy)
+	var meters: Dictionary[Combatant, int] = {}
+	for combatant: Combatant in simulated:
 		meters[combatant] = combatant.action_meter
 	while preview.size() < count and not simulated.is_empty():
-		for combatant in simulated:
+		for combatant: Combatant in simulated:
 			meters[combatant] += combatant.stats.speed
 			if meters[combatant] >= METER_READY:
 				meters[combatant] -= METER_READY
@@ -77,12 +82,12 @@ func get_turn_preview(count: int = 4) -> Array[String]:
 func _advance_until_player_choice() -> void:
 	while player.is_alive() and get_active_enemy() != null:
 		var actors: Array[Combatant] = [player, get_active_enemy()]
-		for actor in actors:
+		for actor: Combatant in actors:
 			actor.action_meter += actor.stats.speed
 			if actor.action_meter >= METER_READY:
 				actor.action_meter -= METER_READY
 				current_actor = actor
-				for message in actor.tick_statuses():
+				for message: String in actor.tick_statuses():
 					_log(message)
 				if not actor.is_alive():
 					_check_enemy_queue()
@@ -98,7 +103,7 @@ func _advance_until_player_choice() -> void:
 	state_changed.emit()
 
 func _enemy_action(enemy: Combatant) -> void:
-	var dealt := player.take_damage(enemy.stats.attack)
+	var dealt: int = player.take_damage(enemy.stats.attack)
 	if enemy.stats.display_name == "Poison Marauder":
 		player.add_status(StatusEffect.Kind.POISON, 2)
 		_log("%s strikes for %d and applies Poison." % [enemy.stats.display_name, dealt])
@@ -122,8 +127,8 @@ func _check_finished() -> void:
 	elif get_active_enemy() == null:
 		combat_finished.emit(true)
 
-func _make_stats(name: String, hp: int, max_qi: int, attack: int, defense: int, speed: int, is_player := false) -> CombatantStats:
-	var stats := CombatantStats.new()
+func _make_stats(name: String, hp: int, max_qi: int, attack: int, defense: int, speed: int, is_player: bool = false) -> CombatantStats:
+	var stats: CombatantStats = CombatantStats.new()
 	stats.display_name = name
 	stats.max_hp = hp
 	stats.max_qi = max_qi

@@ -25,6 +25,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Godot export templates
+        shell: bash
         env:
           GODOT_VERSION: 4.4
           GODOT_RELEASE: 4.4-stable
@@ -41,6 +42,7 @@ jobs:
           godot --headless --version | grep --fixed-strings "$GODOT_VERSION"
 
       - name: Verify Web export preset
+        shell: bash
         run: |
           set -euo pipefail
           test -f export_presets.cfg
@@ -48,6 +50,7 @@ jobs:
           grep -A3 '^\[preset\.0\]' export_presets.cfg | grep --fixed-strings 'platform="Web"'
 
       - name: Export Godot project to HTML5
+        shell: bash
         run: |
           set -euo pipefail
           mkdir -p "$EXPORT_DIR"
